@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script>
+        const years = {"19": "-", "18": "+", "20": "A"};
+        const controls = "0123456789ABCDEFHJKLMNPRSTUVWXY";
+        const el = (id) => document.getElementById(id);
+        const rand = (min, max) => Math.round((Math.random() * (max - min))) + min;
+        Date.prototype.yyyymmdd = function() {
+            var mm = this.getMonth() + 1;
+            var dd = this.getDate();
+            return [(dd>9?'':'0')+dd, (mm>9?'':'0')+mm, (this.getFullYear()+"").substr(2)].join('');
+        };
+        const generatePIC = () => {
+            const dob = new Date(el("dob").value), fem = el("fem").checked;
+            const sign = years[(dob.getFullYear() + "").substr(0, 2)];
+            const date = dob.yyyymmdd();
+            var number; while(number % 2 != +!fem) number = rand(2, 899);
+            number = "0".repeat(3 - (number + "").length) + number;
+            const control = Math.round(((+(date + number) / 31) % 1) * 31);
+            el("result").value = date + sign + number + controls[control];
+        }
+        window.onload = () => {
+            for(i of document.getElementsByTagName("input"))
+                i.addEventListener('input', generatePIC);
+            generatePIC();
+        }
+    </script>
+    <style>
+        #dob{
+            height: 17px;
+            max-width: 130px;
+        }
+    </style>
+</head>
+
+<body>
+    DOB: <input type="date" id="dob" value="1952-10-13"><br>
+    Sex:
+    <input type="radio" id="male" name="sex" checked><label for="male">Male</label>
+    <input type="radio" id="fem" name="sex"><label for="fem">Female</label>
+    <br><br>
+    <input type="text" placeholder="Result" readonly id="result">
+</body>
+
+</html>

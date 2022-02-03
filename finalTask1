@@ -1,0 +1,32 @@
+var daysInMonth = (month, year) => new Date(year, month, 0).getDate();
+var getAge = (dateString) => ~~((Date.now() - (+new Date(dateString))) / (31557600000));
+var checkPIC = (str) => {
+    let errors = [];
+    let years = {"-": "19", "+": "18", "A": "20"};
+    let controls = "0123456789ABCDEFHJKLMNPRSTUVWXY";
+    let day = str.substr(0, 2),
+        month = str.substr(2, 2),
+        year = str.substr(4, 2),
+        sign = str.substr(6, 1),
+        number = str.substr(7, 3),
+        letter = str.substr(10);
+    let control = controls[Math.round(((+(str.substr(0, 6)+number+"") / 31) % 1) * 31)];
+    year = +(years[sign] + year);
+    let age = getAge(year+"-"+month+"-"+day);
+    let isWoman = number % 2 == 0;
+    month = +month, day = +day;
+    if(day > daysInMonth(month, year)) errors.push("day");
+    if(month > 12 || month == 0) errors.push("month");
+    if(year >= new Date().getFullYear() - 14) errors.push("year");
+    if(number < 2 || number > 899) errors.push("number");
+    //if(control != letter) errors.push("control letter");
+    let valid = errors.length == 0;
+    let incorrect = valid ? "" : ". "+errors.join(', ')+" "+(errors.length > 1 ? "are":"is")+" invalid";
+    return `is valid: ${valid + incorrect}
+sex: ${isWoman ? "Female" : "Male"}
+age: ${age}`;
+}
+checkPIC("131052-308T") /*
+is valid: true
+sex: Female
+age: 69 */
